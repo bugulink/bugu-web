@@ -1,0 +1,58 @@
+{
+  "name": "bugu-web",
+  "version": "1.0.0",
+  "description": "BuguLink backend server",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "npm run build && node app/index.js",
+    "build": "rimraf app && BABEL_ENV=production babel --out-dir=app src",
+    "lint": "eslint --ext .js src"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugulink/bugu-web.git"
+  },
+  "keywords": [
+    "BuguLink",
+    "backend",
+    "server",
+    "koajs",
+    "mysql",
+    "redis"
+  ],
+  "author": "bugu.link",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugulink/bugu-web/issues"
+  },
+  "homepage": "https://github.com/bugulink/bugu-web#readme",
+  "dependencies": {
+    "koa": "^2.4.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-csrf": "^3.0.6",
+    "koa-logger": "^3.1.0",
+    "koa-orm": "^2.3.0",
+    "koa-router": "^7.3.0",
+    "koa-session": "^5.8.1",
+    "koa-view": "^2.1.1",
+    "mysql2": "^1.5.1",
+    "qiniu": "^7.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.15.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "pre-commit": "^1.2.2",
+    "rimraf": "^2.6.2"
+  }
+}
