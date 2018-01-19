@@ -23,7 +23,7 @@ const mail = debug ? {
       chunks.push(chunk);
     });
     input.on('end', () => {
-      console.log(Buffer.concat(chunks));
+      console.log(Buffer.concat(chunks).toString());
       callback(null, true);
     });
   }

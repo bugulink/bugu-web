@@ -1,7 +1,7 @@
 import { genTOTP } from '../utils';
 
-export async function main() {
-
+export async function main(ctx) {
+  await ctx.render('index');
 }
 
 export async function captcha(ctx) {

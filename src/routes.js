@@ -7,14 +7,19 @@ export default function routes(app, config) {
   const router = new Router();
 
   router.get('/', home.main);
-  router.get('/links', user.isLogin, link.listPage);
-  router.post('/captcha', home.captcha);
+  router.get('/login', home.main);
+  router.get('/links', user.isLogin, home.main);
+  router.get('/link/:id', user.isLogin, home.main);
+  router.get('/files', user.isLogin, home.main);
+  router.get('/file/:id', user.isLogin, home.main);
 
+  router.post('/captcha', home.captcha);
   router.post('/login', user.login);
-  router.post('/logout', user.logout);
+  router.get('/logout', user.logout);
 
   async function injectParams(ctx, next) {
     ctx.state.env = config.env;
+    ctx.state.user = ctx.session.user;
     ctx.state.year = (new Date()).getFullYear();
     ctx.state.cdnDomain = config.cdn.domain;
     ctx.cookies.set('XSRF-TOKEN', ctx.csrf, {

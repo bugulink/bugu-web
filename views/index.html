@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="description" content="{{env.description}}">
+  <title>{{env.title}}</title>
+  <link rel="shortcut icon" type="image/x-icon" href="{{env.staticRoot}}/favicon.ico">
+  <link rel="stylesheet" href="{{env.staticRoot}}/index.css" />
+</head>
+<body>
+  <div id="root"></div>
+  {% if user %}
+  <script type="text/javascript">window.USER = {{user|dump|safe}};</script>
+  {% endif %}
+  <script src="{{env.staticRoot}}/index.js"></script>
+</body>
+</html>
