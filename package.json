@@ -38,6 +38,7 @@
     "koa-router": "^7.3.0",
     "koa-session": "^5.8.1",
     "koa-view": "^2.1.1",
+    "lodash.template": "^4.4.0",
     "mysql2": "^1.5.1",
     "nodemailer": "^4.4.1",
     "notp": "^2.0.3",
