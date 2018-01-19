@@ -2,7 +2,7 @@
 
 import nm from 'nodemailer';
 import template from 'lodash.template';
-import { downUrl } from './qiniu';
+import { downUrl } from './cdn';
 
 export default function(app, options = {}) {
   const templates = options.templates || {};
@@ -15,10 +15,12 @@ export default function(app, options = {}) {
     });
   });
 
-  app.use(function * mailHandler(next) {
-    if (this.sendMail) return yield * next;
-
-    this.sendMail = (to, cc, tplName, context, files = []) => {
+  app.use(async(ctx, next) => {
+    if (ctx.sendMail) {
+      const flag = await next();
+      return flag;
+    }
+    ctx.sendMail = (to, cc, tplName, context, files = []) => {
       const tpl = templates[tplName];
       const attachments = files.map(f => ({
         filename: f.name,
@@ -34,6 +36,6 @@ export default function(app, options = {}) {
       });
     };
 
-    yield * next;
+    await next();
   });
 }

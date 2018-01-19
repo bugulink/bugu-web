@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'sharer'
     },
     status: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 1,
       comment: '1active，0removed，2suspended'

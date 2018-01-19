@@ -4,7 +4,7 @@ import { generateToken } from '../middlewares/util';
 import { totp } from 'notp';
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('User', {
+  const User = sequelize.define('User', {
     email: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -17,25 +17,26 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 't_user',
-    comment: 'user table',
-    classMethods: {
-      async auth(email, captcha) {
-        let user = await this.findOne({
-          where: { email }
-        });
-        if (user && totp.verify(captcha, user.totp_key, { window: -10 })) {
-          user.totp_key = null;
-          return user;
-        }
-        return null;
-      },
-      async add(email) {
-        const result = await this.create({
-          email,
-          totp_key: generateToken()
-        });
-        return result;
-      }
-    }
+    comment: 'user table'
   });
+  User.auth = async function(email, captcha) {
+    let user = await this.findOne({
+      where: { email }
+    });
+    if (user && totp.verify(captcha, user.totp_key, { window: -10 })) {
+      user.totp_key = null;
+      return user;
+    }
+    return null;
+  };
+
+  User.add = async function(email) {
+    const result = await this.create({
+      email,
+      totp_key: generateToken()
+    });
+    return result;
+  };
+
+  return User;
 };

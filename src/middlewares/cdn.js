@@ -3,7 +3,7 @@
 import qiniu from 'qiniu';
 import config from '../config';
 
-const { accessKey, secretKey, domain } = config.qiniu;
+const { accessKey, secretKey, domain } = config.cdn;
 const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 
 // generate upload token

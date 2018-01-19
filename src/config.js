@@ -64,7 +64,7 @@ export default {
     host: process.env.BUGU_DB_HOST || '127.0.0.1',
     port: process.env.BUGU_DB_PORT || 3306
   },
-  qiniu: {
+  cdn: {
     bucket: process.env.BUGU_QN_NAME || 'bucket',
     accessKey: process.env.BUGU_QN_AK || 'accessKey',
     secretKey: process.env.BUGU_QN_SK || 'secretKey',
@@ -73,7 +73,12 @@ export default {
   mail: {
     ...mail,
     templates: {
-
+      sendCaptcha: {
+        subject: 'Your captcha for signing in bugu.link',
+        html: `
+          {{captcha}}
+        `
+      }
     }
   }
 };

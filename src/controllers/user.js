@@ -1,29 +1,29 @@
-export async function login() {
-  const { User } = this.orm();
-  const { body } = this.request;
+export async function login(ctx) {
+  const { User } = ctx.orm();
+  const { body } = ctx.request;
   const user = await User.auth(body.email, body.captcha);
   if (user) {
-    this.session.authenticated = true;
-    this.session.user = user;
+    ctx.session.authenticated = true;
+    ctx.session.user = user;
   } else {
-    this.flash('error', 'The captcha is invalid');
+    ctx.flash('error', 'The captcha is invalid');
   }
-  this.redirect('/');
+  ctx.redirect('/');
 }
 
-export async function isLogin(next) {
-  if (this.session.authenticated) {
+export async function isLogin(ctx, next) {
+  if (ctx.session.authenticated) {
     await next();
   } else {
-    this.flash('error', 'The captcha is invalid');
-    this.redirect('/');
+    ctx.flash('error', 'The captcha is invalid');
+    ctx.redirect('/');
   }
 }
 
-export async function logout() {
-  if (this.session.authenticated) {
-    delete this.session.authenticated;
-    delete this.session.user;
+export async function logout(ctx) {
+  if (ctx.session.authenticated) {
+    delete ctx.session.authenticated;
+    delete ctx.session.user;
   }
-  this.redirect('/');
+  ctx.redirect('/');
 }
