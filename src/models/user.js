@@ -1,7 +1,6 @@
 'use strict';
 
-import { generateToken } from '../middlewares/util';
-import { totp } from 'notp';
+import { genToken, verifyTOTP } from '../utils';
 
 module.exports = function(sequelize, DataTypes) {
   const User = sequelize.define('User', {
@@ -19,11 +18,12 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 't_user',
     comment: 'user table'
   });
+
   User.auth = async function(email, captcha) {
-    let user = await this.findOne({
+    const user = await this.findOne({
       where: { email }
     });
-    if (user && totp.verify(captcha, user.totp_key, { window: -10 })) {
+    if (user && verifyTOTP(captcha, user.totp_key)) {
       user.totp_key = null;
       return user;
     }
@@ -33,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
   User.add = async function(email) {
     const result = await this.create({
       email,
-      totp_key: generateToken()
+      totp_key: genToken()
     });
     return result;
   };

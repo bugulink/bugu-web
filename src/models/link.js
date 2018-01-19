@@ -27,7 +27,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 1,
-      comment: '1active，0removed，2suspended'
+      comment: '1-active, 0-removed, 2-suspended'
     }
   }, {
     tableName: 't_link',

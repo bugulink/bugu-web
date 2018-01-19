@@ -17,8 +17,8 @@ export default function(app, options = {}) {
 
   app.use(async(ctx, next) => {
     if (ctx.sendMail) {
-      const flag = await next();
-      return flag;
+      await next();
+      return;
     }
     ctx.sendMail = (to, cc, tplName, context, files = []) => {
       const tpl = templates[tplName];
