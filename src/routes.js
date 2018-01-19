@@ -1,12 +1,17 @@
 import Router from 'koa-router';
 import * as home from './controllers/home';
 import * as link from './controllers/link';
+import * as user from './controllers/user';
 
 export default function routes(app, config) {
   const router = new Router();
 
   router.get('/', home.main);
-  router.get('/links', link.listPage);
+  router.get('/links', user.isLogin, link.listPage);
+  router.post('/captcha', home.captcha);
+
+  router.post('/login', user.login);
+  router.post('/logout', user.logout);
 
   async function injectParams(ctx, next) {
     ctx.state.env = config.env;
