@@ -38,7 +38,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 1,
-      comment: '1-active, 0-removed'
+      comment: '1-active, 2-removed'
     }
   }, {
     tableName: 't_file',

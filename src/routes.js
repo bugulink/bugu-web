@@ -1,4 +1,5 @@
 import Router from 'koa-router';
+import * as file from './controllers/file';
 import * as home from './controllers/home';
 import * as link from './controllers/link';
 import * as user from './controllers/user';
@@ -12,6 +13,10 @@ export default function routes(app, config) {
   router.get('/link/:id', user.isLogin, home.main);
   router.get('/files', user.isLogin, home.main);
   router.get('/file/:id', user.isLogin, home.main);
+
+  router.post('/links', user.isLogin, link.list);
+
+  router.post('/files', user.isLogin, file.list);
 
   router.post('/captcha', home.captcha);
   router.post('/login', user.login);

@@ -3,7 +3,7 @@ export async function listPage() {
 }
 
 export async function list(ctx) {
-  const { Link, query } = ctx.orm();
+  const { File, query } = ctx.orm();
   const { body } = ctx.request;
   const { user } = ctx.session;
   const where = {
@@ -12,7 +12,7 @@ export async function list(ctx) {
   if (body.status) {
     where.status = body.status;
   }
-  const links = await Link.findAndCountAll({
+  const files = await File.findAndCountAll({
     where,
     offset: +body.offset,
     limit: +body.limit,
@@ -20,17 +20,17 @@ export async function list(ctx) {
       ['id', 'DESC']
     ]
   });
-  let files = [];
-  if (links.length) {
-    const sql = 'select lf.link_id, f.id, f.name, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id in (?)';
-    const ids = links.map(v => v.id);
-    files = await query(sql, [ids]);
+  let links = [];
+  if (files.length) {
+    const sql = 'select lf.file_id, l.id, l.token, l.code, l.status from r_link_file lf inner join t_link l on lf.link_id=l.id where lf.file_id in (?)';
+    const ids = files.map(v => v.id);
+    links = await query(sql, [ids]);
   }
   ctx.body = {
     code: 0,
     data: {
-      links,
-      files
+      files,
+      links
     }
   };
 }
