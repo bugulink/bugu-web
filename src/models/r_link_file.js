@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'ID'
     },
     link_id: {
-      type: DataTypes.BIGINT.UNSIGNED,
+      type: DataTypes.UUID,
       allowNull: false,
       comment: 'link ID'
     },

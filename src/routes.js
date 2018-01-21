@@ -15,6 +15,7 @@ export default function routes(app, config) {
   router.get('/file/:id', user.isLogin, home.main);
 
   router.post('/links', user.isLogin, link.list);
+  router.post('/link/detail', user.isLogin, link.detail);
 
   router.post('/files', user.isLogin, file.list);
 

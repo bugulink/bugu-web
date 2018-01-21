@@ -1,7 +1,3 @@
-export async function listPage() {
-
-}
-
 export async function list(ctx) {
   const { File, query } = ctx.orm();
   const { body } = ctx.request;
@@ -22,7 +18,7 @@ export async function list(ctx) {
   });
   let links = [];
   if (files.length) {
-    const sql = 'select lf.file_id, l.id, l.token, l.code, l.status from r_link_file lf inner join t_link l on lf.link_id=l.id where lf.file_id in (?)';
+    const sql = 'select lf.file_id, l.id, l.code, l.status from r_link_file lf inner join t_link l on lf.link_id=l.id where lf.file_id in (?)';
     const ids = files.map(v => v.id);
     links = await query(sql, [ids]);
   }

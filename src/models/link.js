@@ -3,23 +3,18 @@
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Link', {
     id: {
-      type: DataTypes.BIGINT.UNSIGNED,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
       comment: 'ID'
     },
-    token: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      comment: 'link token'
-    },
     code: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(10),
       allowNull: false,
       comment: 'link code'
     },
     creator: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'sharer'
     },

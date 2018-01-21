@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'hash value'
     },
     creator: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'uploader'
     },
@@ -35,7 +35,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'file size'
     },
     status: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 1,
       comment: '1-active, 2-removed'

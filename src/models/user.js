@@ -5,7 +5,7 @@ import { genToken, verifyTOTP } from '../utils';
 module.exports = function(sequelize, DataTypes) {
   const User = sequelize.define('User', {
     email: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'user email'
     },
