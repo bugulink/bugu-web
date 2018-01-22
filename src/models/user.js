@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'user email'
     },
     totp_key: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(64),
       allowNull: false,
       comment: 'totp key'
     }

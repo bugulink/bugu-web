@@ -8,7 +8,7 @@ const TOTP_TIME = 300;
 
 export function genToken() {
   let buffer = crypto.randomBytes(256);
-  return crypto.createHash('sha1').update(buffer).digest('hex');
+  return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
 export function genTOTP(key) {

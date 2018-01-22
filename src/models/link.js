@@ -3,14 +3,13 @@
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Link', {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.STRING(64),
       primaryKey: true,
       comment: 'ID'
     },
     code: {
-      type: DataTypes.STRING(10),
-      allowNull: false,
+      type: DataTypes.STRING(4),
+      allowNull: true,
       comment: 'link code'
     },
     creator: {

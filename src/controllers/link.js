@@ -68,3 +68,34 @@ export async function detail(ctx) {
     };
   }
 }
+
+// download page
+export async function download(ctx) {
+  const { Link, query } = ctx.orm();
+  const { id } = ctx.params;
+  const { linkAuth } = ctx.session;
+  const link = await Link.findById(id);
+
+  ctx.assert(link && link.status === 1, 404, 'Link is not found');
+  ctx.state.link = link;
+
+  if (link.code && !linkAuth[link.code]) {
+    ctx.state.linkCode = true;
+  } else {
+    ctx.state.linkCode = false;
+    const sql = 'select f.name, f.key, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
+    const files = await query(sql, [link.id]);
+
+    files.forEach(v => {
+      // actived file
+      if (v.status === 1) {
+        v.key = cdn.downUrl(v.key);
+      } else {
+        v.key = '';
+      }
+    });
+    ctx.state.files = files;
+  }
+
+  await ctx.render('index');
+}

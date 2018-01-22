@@ -12,8 +12,9 @@ export function uptoken() {
   const SIZE = 2 * 1024 * 1024 * 1024;
   const putPolicy = new qiniu.rs.PutPolicy({
     scope: bucket,
-    expires: 3 * 3600,
-    fsizeLimit: SIZE
+    expires: 6 * 3600,
+    fsizeLimit: SIZE,
+    fileType: 1
   });
   return putPolicy.uploadToken(mac);
 }
@@ -22,7 +23,7 @@ export function uptoken() {
 export function downUrl(key) {
   const conf = new qiniu.conf.Config();
   const manager = new qiniu.rs.BucketManager(mac, conf);
-  // validity 24 hour
-  const deadline = parseInt(Date.now() / 1000) + 3600 * 24;
+  // validity 6 hour
+  const deadline = parseInt(Date.now() / 1000) + 3600 * 6;
   return manager.privateDownloadUrl(domain, key, deadline);
 }
