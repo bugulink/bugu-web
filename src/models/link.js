@@ -12,6 +12,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       comment: 'link code'
     },
+    package: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'all file package url'
+    },
     creator: {
       type: DataTypes.STRING(100),
       allowNull: false,
