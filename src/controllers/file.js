@@ -1,3 +1,5 @@
+import * as cdn from '../middlewares/cdn';
+
 export async function list(ctx) {
   const { File, query } = ctx.orm();
   const { body } = ctx.request;
@@ -28,5 +30,12 @@ export async function list(ctx) {
       files,
       links
     }
+  };
+}
+
+export async function uptoken(ctx) {
+  const { user } = ctx.session;
+  ctx.body = {
+    token: cdn.uptoken(user.id)
   };
 }

@@ -10,7 +10,7 @@ export async function login(ctx) {
   ctx.assert(user, 403, 'Security code is invalid');
   ctx.session.authenticated = true;
   ctx.session.user = user;
-  ctx.body = user;
+  ctx.body = { email };
 }
 
 export async function isLogin(ctx, next) {
