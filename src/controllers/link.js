@@ -1,4 +1,61 @@
 import * as cdn from '../middlewares/cdn';
+import { genToken } from '../utils';
+
+export async function add(ctx) {
+  const { Link, RLinkFile, File, sequelize } = ctx.orm();
+  const { body } = ctx.request;
+  const { user } = ctx.session;
+  const transaction = await sequelize.transaction();
+  try {
+    const files = await File.findAll({
+      attribute: ['id'],
+      where: {
+        id: {
+          $in: body.ids
+        },
+        creator: user.email,
+        status: 1
+      },
+      transaction
+    });
+
+    ctx.assert(files && files.length, 400, 'No file is uploaded');
+
+    const link = await Link.create({
+      id: genToken(),
+      creator: user.email
+    }, {
+      transaction
+    });
+
+    const rlfs = [];
+
+    files.forEach(v => {
+      rlfs.push({
+        link_id: link.id,
+        file_id: v.id
+      });
+    });
+
+    await RLinkFile.bulkCreate(rlfs, {
+      transaction
+    });
+
+    await transaction.commit();
+    this.body = {
+      code: 0,
+      data: link,
+      message: 'Generate link success'
+    };
+  } catch (e) {
+    await transaction.rollback();
+    console.warn(e.stack);
+    this.body = {
+      code: 1,
+      message: 'Generate link failed'
+    };
+  }
+}
 
 export async function list(ctx) {
   const { Link, query } = ctx.orm();

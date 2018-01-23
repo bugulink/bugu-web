@@ -1,5 +1,25 @@
 import * as cdn from '../middlewares/cdn';
 
+export async function add(ctx) {
+  const { File } = ctx.orm();
+  const { body } = ctx.request;
+  const { user } = ctx.session;
+  try {
+    body.creator = user.email;
+    const file = await File.create(body);
+    ctx.body = {
+      code: 0,
+      data: file
+    };
+  } catch (e) {
+    console.warn(e.stack);
+    this.body = {
+      code: 1,
+      message: 'Upload file failed'
+    };
+  }
+}
+
 export async function list(ctx) {
   const { File, query } = ctx.orm();
   const { body } = ctx.request;
