@@ -35,7 +35,9 @@ export async function list(ctx) {
 
 export async function uptoken(ctx) {
   const { user } = ctx.session;
+  const prefix = `${user.id}/${Date.now()}/`;
   ctx.body = {
-    token: cdn.uptoken(user.id)
+    prefix,
+    token: cdn.uptoken(prefix)
   };
 }
