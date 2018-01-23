@@ -7,15 +7,15 @@ const { accessKey, secretKey, domain, bucket } = config.cdn;
 const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 
 // generate upload token
-export function uptoken(userId = '') {
+export function uptoken(prefix = '') {
   // File size limit 2G
   const SIZE = 2 * 1024 * 1024 * 1024;
   const putPolicy = new qiniu.rs.PutPolicy({
-    scope: bucket,
+    isPrefixalScope: 1,
+    scope: `${bucket}:${prefix}`,
     expires: 6 * 3600,
     fsizeLimit: SIZE,
-    fileType: 1,
-    saveKey: `${userId}/$(etag)`
+    fileType: 1
   });
   return putPolicy.uploadToken(mac);
 }
