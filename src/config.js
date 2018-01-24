@@ -69,7 +69,8 @@ export default {
     bucket: process.env.BUGU_QN_NAME || 'bucket',
     accessKey: process.env.BUGU_QN_AK || 'accessKey',
     secretKey: process.env.BUGU_QN_SK || 'secretKey',
-    domain: process.env.BUGU_QN_DOMAIN || 'http://bugu.link'
+    domain: process.env.BUGU_QN_DOMAIN || 'http://bugu.link',
+    uphost: process.env.BUGU_QN_UPHOST || 'http://up.qiniu.com'
   },
   mail: {
     ...mail,

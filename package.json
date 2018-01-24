@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/bugulink/bugu-web#readme",
   "dependencies": {
+    "axios": "^0.17.1",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
     "koa-csrf": "^3.0.6",
