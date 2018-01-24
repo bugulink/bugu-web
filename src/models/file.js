@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'hash value'
     },
     creator: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       comment: 'uploader'
     },

@@ -2,32 +2,12 @@ import config from '../config';
 import { makeRequest, encode64 } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
-export async function add(ctx) {
-  const { File } = ctx.orm();
-  const { body } = ctx.request;
-  const { user } = ctx.session;
-  try {
-    body.creator = user.email;
-    const file = await File.create(body);
-    ctx.body = {
-      code: 0,
-      data: file
-    };
-  } catch (e) {
-    console.warn(e.stack);
-    this.body = {
-      code: 1,
-      message: 'Upload file failed'
-    };
-  }
-}
-
 export async function list(ctx) {
   const { File, query } = ctx.orm();
   const { body } = ctx.request;
   const { user } = ctx.session;
   const where = {
-    creator: user.email
+    creator: user.id
   };
   if (body.status) {
     where.status = body.status;
@@ -90,4 +70,21 @@ export async function upload(ctx) {
     hash: info.hash,
     creator: user.id
   });
+}
+
+export async function remove(ctx) {
+  const { File } = ctx.orm();
+  const { id } = ctx.request.body;
+  const { user } = ctx.session;
+  const file = await File.findById(id);
+
+  ctx.assert(file && file.creator === user.id && file.status === 1, 400, 'File is not existed');
+
+  await cdn.removeFile(file.key);
+  // remove success
+  await file.update({
+    status: 0
+  });
+
+  this.body = file;
 }

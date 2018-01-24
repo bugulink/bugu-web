@@ -4,6 +4,12 @@ import { genToken, verifyTOTP } from '../utils';
 
 module.exports = function(sequelize, DataTypes) {
   const User = sequelize.define('User', {
+    id: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      primaryKey: true,
+      autoIncrement: true,
+      comment: 'ID'
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,

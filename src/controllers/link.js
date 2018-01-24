@@ -13,7 +13,7 @@ export async function add(ctx) {
         id: {
           $in: body.ids
         },
-        creator: user.email,
+        creator: user.id,
         status: 1
       },
       transaction
@@ -23,7 +23,7 @@ export async function add(ctx) {
 
     const link = await Link.create({
       id: genToken(),
-      creator: user.email
+      creator: user.id
     }, {
       transaction
     });
@@ -62,7 +62,7 @@ export async function list(ctx) {
   const { body } = ctx.request;
   const { user } = ctx.session;
   const where = {
-    creator: user.email
+    creator: user.id
   };
   if (body.status) {
     where.status = body.status;
@@ -97,7 +97,7 @@ export async function detail(ctx) {
   const { user } = ctx.session;
   const link = await Link.findById(id);
 
-  if (link && link.creator === user.email) {
+  if (link && link.creator === user.id) {
     const sql = 'select f.name, f.key, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
     const files = await query(sql, [link.id]);
 

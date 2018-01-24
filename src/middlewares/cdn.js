@@ -28,3 +28,14 @@ export function downUrl(key) {
   const deadline = parseInt(Date.now() / 1000) + 3600 * 6;
   return manager.privateDownloadUrl(domain, key, deadline);
 }
+
+// remove cdn file
+export function removeFile(key) {
+  const conf = new qiniu.conf.Config();
+  const manager = new qiniu.rs.BucketManager(mac, conf);
+  return new Promise((resolve, reject) => {
+    manager.delete(bucket, key, err => {
+      err ? reject(err) : resolve();
+    });
+  });
+}

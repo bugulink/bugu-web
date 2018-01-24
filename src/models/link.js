@@ -17,8 +17,18 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       comment: 'all file package url'
     },
+    receiver: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      comment: 'link receivers'
+    },
+    message: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      comment: 'sharer message'
+    },
     creator: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       comment: 'sharer'
     },

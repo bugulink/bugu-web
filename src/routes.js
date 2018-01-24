@@ -20,10 +20,10 @@ export default function routes(app, config) {
   router.post('/links', user.isLogin, link.list);
   router.post('/link/detail', user.isLogin, link.detail);
 
-  router.post('/file/add', user.isLogin, file.add);
   router.post('/files', user.isLogin, file.list);
   router.post('/uptoken', user.isLogin, file.uptoken);
   router.post('/upload', user.isLogin, file.upload);
+  router.post('/file/remove', user.isLogin, file.remove);
 
   router.post('/captcha', home.captcha);
   router.post('/login', user.login);
