@@ -73,18 +73,22 @@ export async function upload(ctx) {
 }
 
 export async function remove(ctx) {
-  const { File } = ctx.orm();
+  const { File, RLinkFile } = ctx.orm();
   const { id } = ctx.request.body;
   const { user } = ctx.session;
   const file = await File.findById(id);
 
-  ctx.assert(file && file.creator === user.id && file.status === 1, 400, 'File is not existed');
+  ctx.assert(file && file.creator === user.id, 400, 'File is not existed');
+  const rlfs = await RLinkFile.findAll({
+    where: {
+      file_id: file.id
+    }
+  });
+  ctx.assert(rlfs && rlfs.length, 400, 'File is related to one sharing link');
 
   await cdn.removeFile(file.key);
   // remove success
-  await file.update({
-    status: 0
-  });
+  await file.destroy();
 
-  this.body = file;
+  ctx.body = file;
 }

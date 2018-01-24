@@ -19,6 +19,7 @@ export default function routes(app, config) {
   router.post('/link/add', user.isLogin, link.add);
   router.post('/links', user.isLogin, link.list);
   router.post('/link/detail', user.isLogin, link.detail);
+  router.post('/link/change_code', user.isLogin, link.changeCode);
 
   router.post('/files', user.isLogin, file.list);
   router.post('/uptoken', user.isLogin, file.uptoken);

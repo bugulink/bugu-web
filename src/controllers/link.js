@@ -1,5 +1,5 @@
 import * as cdn from '../middlewares/cdn';
-import { genToken } from '../utils';
+import { genToken, genCode } from '../utils';
 
 export async function add(ctx) {
   const { Link, RLinkFile, File, sequelize } = ctx.orm();
@@ -23,7 +23,7 @@ export async function add(ctx) {
 
     const link = await Link.create({
       id: genToken(),
-      code: (Math.random() * 10000).toFixed(),
+      code: genCode(),
       creator: user.id
     }, {
       transaction
@@ -156,4 +156,19 @@ export async function download(ctx) {
   }
 
   await ctx.render('index');
+}
+
+// change code
+export async function changeCode(ctx) {
+  const { Link } = ctx.orm();
+  const { id } = ctx.request.body;
+  const { user } = ctx.session;
+
+  const link = await Link.findById(id);
+  ctx.assert(link && link.creator === user.id && link.status === 1, 400, 'You have no permission');
+
+  const code = link.code ? null : genCode();
+  await link.update({ code });
+
+  ctx.body = link;
 }

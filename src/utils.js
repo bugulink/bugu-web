@@ -3,6 +3,7 @@
 import crypto from 'crypto';
 import { totp } from 'notp';
 import axios from 'axios';
+import generate from 'nanoid/generate';
 
 // TOTP time 5 minutes
 const TOTP_TIME = 300;
@@ -48,4 +49,8 @@ export function encode64(str) {
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-');
+}
+
+export function genCode(len = 4) {
+  return generate('1234567890', len);
 }

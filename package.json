@@ -41,6 +41,7 @@
     "koa-view": "^2.1.1",
     "lodash.template": "^4.4.0",
     "mysql2": "^1.5.1",
+    "nanoid": "^1.0.1",
     "nodemailer": "^4.4.1",
     "notp": "^2.0.3",
     "qiniu": "^7.1.1"
