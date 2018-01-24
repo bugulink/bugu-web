@@ -23,6 +23,7 @@ export async function add(ctx) {
 
     const link = await Link.create({
       id: genToken(),
+      code: (Math.random() * 10000).toFixed(),
       creator: user.id
     }, {
       transaction
