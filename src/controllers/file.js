@@ -79,12 +79,12 @@ export async function remove(ctx) {
   const file = await File.findById(id);
 
   ctx.assert(file && file.creator === user.id, 400, 'File is not existed');
-  const rlfs = await RLinkFile.findAll({
+  const count = await RLinkFile.count({
     where: {
       file_id: file.id
     }
   });
-  ctx.assert(rlfs && rlfs.length, 400, 'File is related to one sharing link');
+  ctx.assert(count === 0, 400, 'File is related to one sharing link');
 
   await cdn.removeFile(file.key);
   // remove success
