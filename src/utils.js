@@ -54,3 +54,13 @@ export function encode64(str) {
 export function genCode(len = 4) {
   return generate('1234567890', len);
 }
+
+export function convertSize(size) {
+  const UNIT = ['Byte', 'KB', 'MB', 'GB'];
+  let index = 0;
+  while (size < 1024 && index < 3) {
+    size /= 1024;
+    index++;
+  }
+  return `${Math.round(size)} ${UNIT[index]}`;
+}

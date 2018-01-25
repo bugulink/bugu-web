@@ -32,6 +32,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: 'sharer'
     },
+    ttl: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      comment: 'TTL'
+    },
     status: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,

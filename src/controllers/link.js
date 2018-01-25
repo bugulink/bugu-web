@@ -1,5 +1,6 @@
+import config from '../config';
+import { genToken, genCode, convertSize } from '../utils';
 import * as cdn from '../middlewares/cdn';
-import { genToken, genCode } from '../utils';
 
 export async function add(ctx) {
   const { Link, RLinkFile, File, sequelize } = ctx.orm();
@@ -23,6 +24,7 @@ export async function add(ctx) {
     const link = await Link.create({
       id: genToken(),
       code: genCode(),
+      ttl: config.fileTTL,
       creator: user.id
     }, {
       transaction
@@ -50,18 +52,79 @@ export async function add(ctx) {
   }
 }
 
+export async function sendEmail(ctx) {
+  const { Link, RLinkFile, File, sequelize } = ctx.orm();
+  const { body } = ctx.request;
+  const { user } = ctx.session;
+  const transaction = await sequelize.transaction();
+  try {
+    const files = await File.findAll({
+      attribute: ['id'],
+      where: {
+        id: {
+          $in: body.ids
+        },
+        creator: user.id
+      },
+      transaction
+    });
+
+    ctx.assert(files && files.length, 400, 'No file is uploaded');
+
+    const link = await Link.create({
+      id: genToken(),
+      code: genCode(),
+      receiver: body.receiver.join(';'),
+      message: body.message,
+      ttl: config.fileTTL,
+      creator: user.id
+    }, {
+      transaction
+    });
+
+    const rlfs = [];
+    let size = 0;
+
+    files.forEach(v => {
+      size += v.size;
+      rlfs.push({
+        link_id: link.id,
+        file_id: v.id
+      });
+    });
+
+    await RLinkFile.bulkCreate(rlfs, {
+      transaction
+    });
+
+    await ctx.sendMail(body.receiver, null, 'sendLink', {
+      sender: user.email,
+      link: link.id,
+      code: link.code,
+      message: link.message,
+      size: convertSize(size),
+      total: files.length,
+      ttl: link.ttl / 24 / 36000
+    });
+
+    await transaction.commit();
+    ctx.body = link;
+  } catch (err) {
+    await transaction.rollback();
+    console.warn(err.stack);
+    throw err;
+  }
+}
+
 export async function list(ctx) {
   const { Link, query } = ctx.orm();
   const { body } = ctx.request;
   const { user } = ctx.session;
-  const where = {
-    creator: user.id
-  };
-  if (body.status) {
-    where.status = body.status;
-  }
   const links = await Link.findAndCountAll({
-    where,
+    where: {
+      status: 1,
+      creator: user.id
+    },
     offset: +body.offset,
     limit: +body.limit,
     order: [

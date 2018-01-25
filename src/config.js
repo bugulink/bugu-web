@@ -79,13 +79,22 @@ export default {
       sendCaptcha: {
         subject: 'Your captcha for signing in bugu.link',
         html: `
-          {{captcha}}
+          Dear {{user}}
+          <br><br>Your <a href="https://bugu.link">bugu.link</a> captcha is <span style="font-weight: 500; color: #f4364c;">{{captcha}}</span>. It will be expired in 5 minutes.
+          <br><br><br><br>To make sure our emails arrive, please add noreply@bugu.link to your contacts.
         `
       },
       sendLink: {
-        subject: '{{sender}} sent you files via bugu.link',
+        subject: 'Bugu.link remind you to get your files',
         html: `
-          {{link}}
+          <span style="font-size: 24px;">
+            <span style="color: #f4364c;">{{sender}}</span> sent you some files
+          </span>
+          <br><br>{{total}} files, {{size}} in total・ Will be expired in {{ttl}} days
+          <br><br><br><br>Link: <a href="{{link}}">{{link}}</a>
+          <br><br>Code: <span style="font-weight: 500; color: #f4364c;">{{code}}</span>
+          <br><br>Message: {{message}}
+          <br><br><br><br><br><br><br><br>The service is provided by <a href="https://bugu.link">bugu.link</a>
         `
       }
     }
