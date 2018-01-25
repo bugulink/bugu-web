@@ -9,7 +9,7 @@ export async function add(ctx) {
   const transaction = await sequelize.transaction();
   try {
     const files = await File.findAll({
-      attribute: ['id'],
+      attributes: ['id'],
       where: {
         id: {
           $in: body.ids
@@ -59,7 +59,7 @@ export async function sendEmail(ctx) {
   const transaction = await sequelize.transaction();
   try {
     const files = await File.findAll({
-      attribute: ['id'],
+      attributes: ['id'],
       where: {
         id: {
           $in: body.ids
@@ -99,7 +99,7 @@ export async function sendEmail(ctx) {
 
     await ctx.sendMail(body.receiver, null, 'sendLink', {
       sender: user.email,
-      link: link.id,
+      link: `https://bugu.link/download/${link.id}`,
       code: link.code,
       message: link.message || 'No message',
       size: convertSize(size),
@@ -167,16 +167,15 @@ export async function detail(ctx) {
 export async function download(ctx) {
   const { Link, query } = ctx.orm();
   const { id } = ctx.params;
-  const { linkAuth } = ctx.session;
+  const linkAuth = ctx.session.linkAuth || {};
   const link = await Link.findById(id);
 
   ctx.assert(link && link.status === 1, 404, 'Link is not found');
-  ctx.state.link = link;
 
   if (link.code && !linkAuth[link.code]) {
-    ctx.state.linkCode = true;
+    ctx.state.isCode = true;
   } else {
-    ctx.state.linkCode = false;
+    ctx.state.isCode = false;
     const sql = 'select f.name, f.key, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
     const files = await query(sql, [link.id]);
 
@@ -190,6 +189,10 @@ export async function download(ctx) {
     });
     ctx.state.files = files;
   }
+
+  link.code = null;
+  link.receiver = null;
+  ctx.state.link = link;
 
   await ctx.render('index');
 }
@@ -219,6 +222,24 @@ export async function remove(ctx) {
   ctx.assert(link && link.creator === user.id && link.status === 1, 400, 'You have no permission');
 
   await link.update({ status: 0 });
+
+  ctx.body = link;
+}
+
+// check download page code
+export async function checkCode(ctx) {
+  const { Link } = ctx.orm();
+  const { id } = ctx.params;
+  const { code } = ctx.request.body;
+
+  if (!ctx.session.linkAuth) {
+    ctx.session.linkAuth = {};
+  }
+
+  const link = await Link.findById(id);
+  ctx.assert(link && link.status === 1, 404, 'Link is not found');
+  ctx.assert(link.code === code, 400, 'Code is invalid');
+  link.receiver = null;
 
   ctx.body = link;
 }
