@@ -26,13 +26,7 @@ export async function list(ctx) {
     const ids = files.map(v => v.id);
     links = await query(sql, [ids]);
   }
-  ctx.body = {
-    code: 0,
-    data: {
-      files,
-      links
-    }
-  };
+  ctx.body = { files, links };
 }
 
 export async function uptoken(ctx) {
@@ -68,7 +62,8 @@ export async function upload(ctx) {
     name,
     key: info.key,
     hash: info.hash,
-    creator: user.id
+    creator: user.id,
+    ttl: config.fileTTL
   });
 }
 

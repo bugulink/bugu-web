@@ -34,11 +34,10 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: 0,
       comment: 'file size'
     },
-    status: {
+    ttl: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
-      defaultValue: 1,
-      comment: '1-active, 2-removed'
+      comment: 'TTL'
     }
   }, {
     tableName: 't_file',

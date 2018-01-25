@@ -52,6 +52,7 @@ export default {
     key: 'sid',
     maxAge
   },
+  fileTTL: 7 * 24 * 60 * 60,
   viewPath: join(__dirname, '../views'),
   database: {
     pool,
@@ -79,6 +80,12 @@ export default {
         subject: 'Your captcha for signing in bugu.link',
         html: `
           {{captcha}}
+        `
+      },
+      sendLink: {
+        subject: '{{sender}} sent you files via bugu.link',
+        html: `
+          {{link}}
         `
       }
     }

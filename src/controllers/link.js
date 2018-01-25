@@ -13,8 +13,7 @@ export async function add(ctx) {
         id: {
           $in: body.ids
         },
-        creator: user.id,
-        status: 1
+        creator: user.id
       },
       transaction
     });
@@ -43,18 +42,11 @@ export async function add(ctx) {
     });
 
     await transaction.commit();
-    this.body = {
-      code: 0,
-      data: link,
-      message: 'Generate link success'
-    };
-  } catch (e) {
+    ctx.body = link;
+  } catch (err) {
     await transaction.rollback();
-    console.warn(e.stack);
-    this.body = {
-      code: 1,
-      message: 'Generate link failed'
-    };
+    console.warn(err.stack);
+    throw err;
   }
 }
 
@@ -78,17 +70,11 @@ export async function list(ctx) {
   });
   let files = [];
   if (links.length) {
-    const sql = 'select lf.link_id, f.id, f.name, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id in (?)';
+    const sql = 'select lf.link_id, f.id, f.name, f.ttl from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id in (?)';
     const ids = links.map(v => v.id);
     files = await query(sql, [ids]);
   }
-  ctx.body = {
-    code: 0,
-    data: {
-      links,
-      files
-    }
-  };
+  ctx.body = { links, files };
 }
 
 // sharer views link detail
@@ -98,33 +84,20 @@ export async function detail(ctx) {
   const { user } = ctx.session;
   const link = await Link.findById(id);
 
-  if (link && link.creator === user.id) {
-    const sql = 'select f.name, f.key, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
-    const files = await query(sql, [link.id]);
+  ctx.assert(link && link.creator === user.id, 400, 'Cannot find this link');
+  const sql = 'select f.name, f.key, f.ttl from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
+  const files = await query(sql, [link.id]);
 
-    files.forEach(v => {
-      // actived file
-      if (v.status === 1) {
-        v.key = cdn.downUrl(v.key);
-      } else {
-        v.key = '';
-      }
-    });
+  files.forEach(v => {
+    // actived file
+    if (v.status === 1) {
+      v.key = cdn.downUrl(v.key);
+    } else {
+      v.key = '';
+    }
+  });
 
-    this.body = {
-      code: 0,
-      data: {
-        link,
-        files
-      },
-      message: 'Find the link success'
-    };
-  } else {
-    this.body = {
-      code: 1,
-      msg: 'Cannot find this link'
-    };
-  }
+  ctx.body = { link, files };
 }
 
 // download page
