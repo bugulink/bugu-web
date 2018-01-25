@@ -101,7 +101,7 @@ export async function sendEmail(ctx) {
       sender: user.email,
       link: link.id,
       code: link.code,
-      message: link.message,
+      message: link.message || 'No message',
       size: convertSize(size),
       total: files.length,
       ttl: link.ttl / 24 / 36000
@@ -205,6 +205,20 @@ export async function changeCode(ctx) {
 
   const code = link.code ? null : genCode();
   await link.update({ code });
+
+  ctx.body = link;
+}
+
+// remove link status=0
+export async function remove(ctx) {
+  const { Link } = ctx.orm();
+  const { id } = ctx.request.body;
+  const { user } = ctx.session;
+
+  const link = await Link.findById(id);
+  ctx.assert(link && link.creator === user.id && link.status === 1, 400, 'You have no permission');
+
+  await link.update({ status: 0 });
 
   ctx.body = link;
 }
