@@ -39,7 +39,7 @@ export async function add(ctx) {
     await RLinkFile.bulkCreate(linkFiles, { transaction });
 
     if (mailto) {
-      const size = files.reduce((p, c) => (p + c.size));
+      const size = files.reduce((p, c) => (p + c.size), 0);
       await ctx.sendMail(mailto, null, 'sendLink', {
         sender: user.email,
         link: `https://bugu.link/download/${link.id}`,
@@ -77,7 +77,7 @@ export async function list(ctx) {
   let files = [];
   if (linkIds.length) {
     const sql = `
-      SELECT lf.link_id, f.id, f.name, f.ttl
+      SELECT lf.link_id, f.id, f.name, f.size
       FROM r_link_file lf
       INNER JOIN t_file f ON lf.file_id=f.id
       WHERE lf.link_id IN (?)
