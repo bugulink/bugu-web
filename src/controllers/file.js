@@ -16,7 +16,11 @@ export async function list(ctx) {
     order: [['id', 'DESC']]
   });
   data.rows.forEach(file => {
-    file.url = cdn.downUrl(file.key);
+    const exp = file.createdAt.getTime() + file.ttl * 1000;
+    file.remain = Math.floor((exp - Date.now()) / 1000);
+    if (file.remain > 0) {
+      file.url = cdn.downUrl(file.key);
+    }
   });
   ctx.body = data;
 }
