@@ -4,140 +4,87 @@ import * as cdn from '../middlewares/cdn';
 
 export async function add(ctx) {
   const { Link, RLinkFile, File, sequelize } = ctx.orm();
-  const { body } = ctx.request;
+  const { ids, receiver, message } = ctx.request.body;
   const { user } = ctx.session;
+
+  ctx.assert(Array.isArray(ids) && ids.length, 400, 'No files uploaded');
+
   const transaction = await sequelize.transaction();
   try {
     const files = await File.findAll({
-      attributes: ['id'],
+      transaction,
+      attributes: ['id', 'size'],
       where: {
-        id: {
-          $in: body.ids
-        },
+        id: { $in: ids },
         creator: user.id
-      },
-      transaction
+      }
     });
 
-    ctx.assert(files && files.length, 400, 'No file is uploaded');
+    ctx.assert(files.length, 400, 'No files uploaded');
 
+    const mailto = Array.isArray(receiver) ? receiver.join(';') : '';
     const link = await Link.create({
       id: genToken(),
       code: genCode(),
       ttl: config.fileTTL,
-      creator: user.id
-    }, {
-      transaction
-    });
+      creator: user.id,
+      receiver: mailto,
+      message: message
+    }, { transaction });
+    const linkFiles = files.map(file => ({
+      link_id: link.id,
+      file_id: file.id
+    }));
 
-    const rlfs = [];
+    await RLinkFile.bulkCreate(linkFiles, { transaction });
 
-    files.forEach(v => {
-      rlfs.push({
-        link_id: link.id,
-        file_id: v.id
+    if (mailto) {
+      const size = files.reduce((p, c) => (p + c.size));
+      await ctx.sendMail(mailto, null, 'sendLink', {
+        sender: user.email,
+        link: `https://bugu.link/download/${link.id}`,
+        code: link.code,
+        message: link.message || 'No message',
+        size: convertSize(size),
+        total: files.length,
+        ttl: link.ttl / (24 * 3600)
       });
-    });
-
-    await RLinkFile.bulkCreate(rlfs, {
-      transaction
-    });
+    }
 
     await transaction.commit();
     ctx.body = link;
   } catch (err) {
+    console.error(err.stack);
     await transaction.rollback();
-    console.warn(err.stack);
-    throw err;
-  }
-}
-
-export async function sendEmail(ctx) {
-  const { Link, RLinkFile, File, sequelize } = ctx.orm();
-  const { body } = ctx.request;
-  const { user } = ctx.session;
-  const transaction = await sequelize.transaction();
-  try {
-    const files = await File.findAll({
-      attributes: ['id'],
-      where: {
-        id: {
-          $in: body.ids
-        },
-        creator: user.id
-      },
-      transaction
-    });
-
-    ctx.assert(files && files.length, 400, 'No file is uploaded');
-
-    const link = await Link.create({
-      id: genToken(),
-      code: genCode(),
-      receiver: body.receiver.join(';'),
-      message: body.message,
-      ttl: config.fileTTL,
-      creator: user.id
-    }, {
-      transaction
-    });
-
-    const rlfs = [];
-    let size = 0;
-
-    files.forEach(v => {
-      size += v.size;
-      rlfs.push({
-        link_id: link.id,
-        file_id: v.id
-      });
-    });
-
-    await RLinkFile.bulkCreate(rlfs, {
-      transaction
-    });
-
-    await ctx.sendMail(body.receiver, null, 'sendLink', {
-      sender: user.email,
-      link: `https://bugu.link/download/${link.id}`,
-      code: link.code,
-      message: link.message || 'No message',
-      size: convertSize(size),
-      total: files.length,
-      ttl: link.ttl / 24 / 36000
-    });
-
-    await transaction.commit();
-    ctx.body = link;
-  } catch (err) {
-    await transaction.rollback();
-    console.warn(err.stack);
     throw err;
   }
 }
 
 export async function list(ctx) {
   const { Link, query } = ctx.orm();
-  const { body } = ctx.request;
+  const { offset, limit } = ctx.request.body;
   const { user } = ctx.session;
-  const links = await Link.findAndCountAll({
+  const data = await Link.findAndCountAll({
     where: {
       status: 1,
       creator: user.id
     },
-    offset: +body.offset,
-    limit: +body.limit,
-    order: [
-      ['id', 'DESC']
-    ]
+    offset: parseInt(offset, 10) || 0,
+    limit: parseInt(limit, 10) || 20,
+    order: 'id DESC'
   });
+  const linkIds = data.rows.map(link => link.id);
   let files = [];
-  if (links.length) {
-    const sql = 'select lf.link_id, f.id, f.name, f.ttl from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id in (?)';
-    const ids = links.map(v => v.id);
-    files = await query(sql, [ids]);
+  if (linkIds.length) {
+    const sql = `
+      SELECT lf.link_id, f.id, f.name, f.ttl
+      FROM r_link_file lf
+      INNER JOIN t_file f ON lf.file_id=f.id
+      WHERE lf.link_id IN (?)
+    `;
+    files = await query(sql, [linkIds]);
   }
-  ctx.body = { links, files };
+  ctx.body = { ...data, files };
 }
 
 // sharer views link detail
