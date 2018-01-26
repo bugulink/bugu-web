@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="description" content="{{env.description}}">
+  <title>{{env.title}}</title>
+  <link rel="shortcut icon" type="image/x-icon" href="{{env.staticRoot}}/favicon.ico">
+  <link rel="stylesheet" href="{{env.staticRoot}}/download.css" />
+</head>
+<body>
+  <div class="main">
+    <div class="header">
+      <div class="layout-container clearfix">
+        <div class="logo">
+          <a class="logo-link" href="/">
+            <span class="image"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="main-wrapper">
+      <div class="download-section">
+        {% if isCode %}
+        <div class="code-form">
+          <form class="form code-content" action="/download/{{link.id}}/check_code" method="POST">
+            <input type="hidden" name="_csrf" value="{{csrf}}">
+            <div class="form-item">
+              <div class="form-control">
+                <span class="input-prefix"><i class="icon icon-lock"></i></span>
+                <input name="code" class="input" type="text" placeholder="Please input code">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+            {% if messages.error %}
+            <div class="alert alert-error">{{messages.error}}</div>
+            {% endif %}
+          </form>
+        </div>
+        {% else %}
+        <div class="file-container">
+          <div class="download-title">
+            <span>Welcome to Download Files</span>
+          </div>
+          <div class="file-list">
+            {% for f in files %}
+            <div class="file-item">
+              <div class="file-link">
+                <i class="icon icon-file"></i>
+                <span>{{f.name}}</span>
+              </div>
+              <div class="file-action">
+                {% if f.key %}
+                <a href="{{f.key}}" download><i class="icon icon-download"></i></a>
+                {% else %}
+                <span>expired</span>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% if link.package %}
+          <div class="download-btns">
+            <a href="{{link.package}}" class="btn btn-primary">Download All</a>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="footer">
+      <div class="container">Copyright © {{year}} BuguLink. All Rights Reserved.</div>
+    </div>
+  </div>
+</body>
+</html>

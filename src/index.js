@@ -9,6 +9,7 @@ import ORM from 'koa-orm';
 import config from './config';
 import routes from './routes';
 import error from './middlewares/error';
+import flash from './middlewares/flash';
 import mail from './middlewares/mail';
 
 const app = new Koa();
@@ -40,6 +41,7 @@ app.orm.database().sync({
 
 /** Middlewares **/
 error(app);
+flash(app);
 mail(app, config.mail);
 
 /** Router **/
