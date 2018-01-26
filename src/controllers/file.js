@@ -13,7 +13,7 @@ export async function list(ctx) {
     },
     offset: parseInt(offset, 10) || 0,
     limit: parseInt(limit, 10) || 20,
-    order: 'id DESC'
+    order: [['id', 'DESC']]
   });
   data.rows.forEach(file => {
     file.url = cdn.downUrl(file.key);
