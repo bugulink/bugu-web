@@ -3,30 +3,22 @@ import { makeRequest, encode64 } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function list(ctx) {
-  const { File, query } = ctx.orm();
-  const { body } = ctx.request;
+  const { File } = ctx.orm();
+  const { offset, limit } = ctx.request.body;
   const { user } = ctx.session;
-  const where = {
-    creator: user.id
-  };
-  if (body.status) {
-    where.status = body.status;
-  }
-  const files = await File.findAndCountAll({
-    where,
-    offset: +body.offset,
-    limit: +body.limit,
-    order: [
-      ['id', 'DESC']
-    ]
+  const data = await File.findAndCountAll({
+    raw: true,
+    where: {
+      creator: user.id
+    },
+    offset: parseInt(offset, 10) || 0,
+    limit: parseInt(limit, 10) || 20,
+    order: 'id DESC'
   });
-  let links = [];
-  if (files.length) {
-    const sql = 'select lf.file_id, l.id, l.code, l.ttl from r_link_file lf inner join t_link l on l.id=lf.link_id and l.status=1 where lf.file_id in (?)';
-    const ids = files.map(v => v.id);
-    links = await query(sql, [ids]);
-  }
-  ctx.body = { files, links };
+  data.rows.forEach(file => {
+    file.url = cdn.downUrl(file.key);
+  });
+  ctx.body = data;
 }
 
 export async function uptoken(ctx) {
