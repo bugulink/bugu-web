@@ -15,7 +15,7 @@ export default function routes(app, config) {
   router.get('/file/:id', user.isLogin, home.main);
 
   router.get('/download/:id', link.download);
-  router.post('/download/check_code', link.checkCode);
+  router.post('/download/:id/check_code', link.checkCode);
 
   router.post('/link/add', user.isLogin, link.add);
   router.post('/link/send_email', user.isLogin, link.sendEmail);

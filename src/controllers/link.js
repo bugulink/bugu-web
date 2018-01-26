@@ -156,7 +156,7 @@ export async function detail(ctx) {
     if (v.status === 1) {
       v.key = cdn.downUrl(v.key);
     } else {
-      v.key = '';
+      v.key = null;
     }
   });
 
@@ -172,29 +172,30 @@ export async function download(ctx) {
 
   ctx.assert(link && link.status === 1, 404, 'Link is not found');
 
-  if (link.code && !linkAuth[link.code]) {
+  if (link.code && !linkAuth[link.id]) {
+    ctx.state.csrf = ctx.csrf;
     ctx.state.isCode = true;
   } else {
     ctx.state.isCode = false;
-    const sql = 'select f.name, f.key, f.status from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
+    const sql = 'select f.name, f.key, f.ttl, f.createdAt from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
     const files = await query(sql, [link.id]);
 
     files.forEach(v => {
-      // actived file
-      if (v.status === 1) {
-        v.key = cdn.downUrl(v.key);
+      // expired file
+      if (v.createdAt.getTime() + v.ttl * 1000 < Date.now()) {
+        v.key = null;
+        link.package = null;
       } else {
-        v.key = '';
+        v.key = cdn.downUrl(v.key);
       }
     });
     ctx.state.files = files;
+    if (link.package) {
+      link.package = cdn.downUrl(link.package);
+    }
   }
-
-  link.code = null;
-  link.receiver = null;
   ctx.state.link = link;
-
-  await ctx.render('index');
+  await ctx.render('download');
 }
 
 // change code
@@ -232,14 +233,22 @@ export async function checkCode(ctx) {
   const { id } = ctx.params;
   const { code } = ctx.request.body;
 
-  if (!ctx.session.linkAuth) {
-    ctx.session.linkAuth = {};
+  try {
+    ctx.assert(code, 400, 'Code is required');
+
+    if (!ctx.session.linkAuth) {
+      ctx.session.linkAuth = {};
+    }
+
+    const link = await Link.findById(id);
+    ctx.assert(link && link.status === 1, 404, 'Link is not found');
+    ctx.assert(link.code === code, 400, 'Code is invalid');
+    ctx.session.linkAuth[link.id] = true;
+
+    ctx.redirect(`/download/${link.id}`);
+  } catch (e) {
+    console.warn(e);
+    ctx.flash('error', e.message || 'System error');
+    ctx.redirect(`/download/${id}`);
   }
-
-  const link = await Link.findById(id);
-  ctx.assert(link && link.status === 1, 404, 'Link is not found');
-  ctx.assert(link.code === code, 400, 'Code is invalid');
-  link.receiver = null;
-
-  ctx.body = link;
 }
