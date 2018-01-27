@@ -55,12 +55,31 @@ export function genCode(len = 4) {
   return generate('1234567890', len);
 }
 
-export function convertSize(size) {
-  const UNIT = ['Byte', 'KB', 'MB', 'GB'];
-  let index = 0;
-  while (size < 1024 && index < 3) {
-    size /= 1024;
-    index++;
+const mags = ' KMGTPEZY';
+export function humanSize(bytes, precision) {
+  const magnitude = Math.min(Math.log(bytes) / Math.log(1024) | 0, mags.length - 1);
+  const result = bytes / (1024 ** magnitude);
+  const suffix = `${mags[magnitude].trim()}B`;
+  return result.toFixed(precision) + suffix;
+}
+
+function pluralize(time, label) {
+  if (time === 1) {
+    return time + label;
   }
-  return `${Math.round(size)} ${UNIT[index]}`;
+  return `${time}${label}s`;
+}
+
+export function remain(ttl) {
+  if (ttl <= 0) {
+    return 'Expired';
+  }
+  const { round } = Math;
+  if (ttl < 3600) {
+    return pluralize(round(ttl / 60), ' minute');
+  } else if (ttl < 86400) {
+    return pluralize(round(ttl / 3600), ' hour');
+  }
+
+  return pluralize(round(ttl / 86400), ' day');
 }

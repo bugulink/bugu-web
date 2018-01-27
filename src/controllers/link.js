@@ -1,5 +1,5 @@
 import config from '../config';
-import { genToken, genCode, convertSize } from '../utils';
+import { genToken, genCode, humanSize, remain } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function add(ctx) {
@@ -45,7 +45,7 @@ export async function add(ctx) {
         link: `https://bugu.link/download/${link.id}`,
         code: link.code,
         message: link.message || 'No message',
-        size: convertSize(size),
+        size: humanSize(size, 1),
         total: files.length,
         ttl: link.ttl / (24 * 3600)
       });
@@ -116,30 +116,35 @@ export async function download(ctx) {
   const { id } = ctx.params;
   const linkAuth = ctx.session.linkAuth || {};
   const link = await Link.findById(id);
+  const linkttl = Math.floor((link.createdAt.getTime() + link.ttl * 1000 - Date.now()) / 1000);
 
-  ctx.assert(link && link.status === 1, 404, 'Link is not found');
+  ctx.assert(link && link.status === 1 && linkttl >= 0, 404, 'Link is not found');
 
   if (link.code && !linkAuth[link.id]) {
     ctx.state.csrf = ctx.csrf;
     ctx.state.isCode = true;
   } else {
     ctx.state.isCode = false;
-    const sql = 'select f.name, f.key, f.ttl, f.createdAt from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
+    const sql = 'select f.name, f.key, f.size, f.ttl, f.createdAt from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
     const files = await query(sql, [link.id]);
 
     files.forEach(v => {
+      const filettl = Math.floor((v.createdAt.getTime() + v.ttl * 1000 - Date.now()) / 1000);
       // expired file
-      if (v.createdAt.getTime() + v.ttl * 1000 < Date.now()) {
+      if (filettl < 0) {
         v.key = null;
         link.package = null;
       } else {
         v.key = cdn.downUrl(v.key);
       }
+      v.ttl = remain(filettl);
+      v.size = humanSize(v.size, 1);
     });
     ctx.state.files = files;
     if (link.package) {
       link.package = cdn.downUrl(link.package);
     }
+    link.ttl = remain(linkttl);
   }
   ctx.state.link = link;
   await ctx.render('download');

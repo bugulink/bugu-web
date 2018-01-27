@@ -24,8 +24,8 @@
       </div>
     </div>
     <div class="main-wrapper">
-      <div class="download-section">
-        {% if isCode %}
+      {% if isCode %}
+      <div class="code-section">
         <div class="code-form">
           <form class="form code-content" action="/download/{{link.id}}/check_code" method="POST">
             <input type="hidden" name="_csrf" value="{{csrf}}">
@@ -41,36 +41,55 @@
             {% endif %}
           </form>
         </div>
-        {% else %}
-        <div class="file-container">
-          <div class="download-title">
-            <span>Welcome to Download Files</span>
-          </div>
-          <div class="file-list">
-            {% for f in files %}
-            <div class="file-item">
-              <div class="file-link">
-                <i class="icon icon-file"></i>
-                <span>{{f.name}}</span>
-              </div>
-              <div class="file-action">
-                {% if f.key %}
-                <a href="{{f.key}}" download><i class="icon icon-download"></i></a>
-                {% else %}
-                <span>expired</span>
-                {% endif %}
-              </div>
-            </div>
-            {% endfor %}
-          </div>
+      </div>
+      {% else %}
+      <div class="download-section">
+        <div class="download-container">
+          <div class="download-title">Link will expire in {{link.ttl}}</div>
+          <table class="table table-hover">
+            <colgroup>
+              <col width="69%">
+              <col width="15%">
+              <col width="15%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th class="center">Size</th>
+                <th class="center">Remain</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in files %}
+              {% if f.key %}
+              <tr>
+                <td>
+                  <div class="ellipsis">
+                    <a href="{{f.key}}" title="{{f.name}}" download>{{f.name}}</a>
+                  </div>
+                </td>
+              {% else %}
+              <tr class="disabled">
+                <td>
+                  <div class="ellipsis">
+                    <span title="{{f.name}}">{{f.name}}</a>
+                  </div>
+                </td>
+              {% endif %}                
+                <td class="center">{{f.size}}</td>
+                <td class="center">{{f.ttl}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
           {% if link.package %}
           <div class="download-btns">
             <a href="{{link.package}}" class="btn btn-primary">Download All</a>
           </div>
           {% endif %}
         </div>
-        {% endif %}
       </div>
+      {% endif %}
     </div>
     <div class="footer">
       <div class="container">Copyright © {{year}} BuguLink. All Rights Reserved.</div>
