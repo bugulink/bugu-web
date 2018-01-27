@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="description" content="{{env.description}}">
+  <title>{{env.title}}</title>
+  <link rel="shortcut icon" type="image/x-icon" href="{{env.staticRoot}}/favicon.ico">
+  <link rel="stylesheet" href="{{env.staticRoot}}/error.css" />
+</head>
+<body>
+  <div class="header"></div>
+  <div class="main">
+    <div class="main-wrapper">
+      <div class="error-container">
+        <div class="error-image"></div>
+        <h1>{{status}}</h1>
+        <p>{{message}}</p>
+        <p><a class="btn btn-lg btn-primary" href="https://bugu.link" role="button">Go to BuguLink »</a></p>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="container">Copyright © {{year}} BuguLink. All Rights Reserved.</div>
+    </div>
+  </div>
+</body>
+</html>
