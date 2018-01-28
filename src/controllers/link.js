@@ -71,7 +71,7 @@ export async function list(ctx) {
     },
     offset: parseInt(offset, 10) || 0,
     limit: parseInt(limit, 10) || 20,
-    order: [['id', 'DESC']]
+    order: [['createdAt', 'DESC']]
   });
   const linkIds = data.rows.map(link => link.id);
   let files = [];
