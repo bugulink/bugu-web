@@ -3,7 +3,7 @@ import { genToken, genCode, humanSize, remain } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function add(ctx) {
-  const { Link, RLinkFile, File, sequelize } = ctx.orm();
+  const { Link, RLinkFile, File, RLinkPersistent, sequelize } = ctx.orm();
   const { ids, receiver, message } = ctx.request.body;
   const { user } = ctx.session;
 
@@ -13,7 +13,7 @@ export async function add(ctx) {
   try {
     const files = await File.findAll({
       transaction,
-      attributes: ['id', 'size'],
+      attributes: ['id', 'size', 'key'],
       where: {
         id: { $in: ids },
         creator: user.id
@@ -50,6 +50,13 @@ export async function add(ctx) {
         ttl: link.ttl / (24 * 3600)
       });
     }
+
+    // generate download all link
+    const persistent = await cdn.combineFiles(link, files);
+    await RLinkPersistent.create({
+      link_id: link.id,
+      persistent_id: persistent
+    }, { transaction });
 
     await transaction.commit();
     ctx.body = link;

@@ -14,8 +14,8 @@ export function uptoken(prefix = '') {
     isPrefixalScope: 1,
     scope: `${bucket}:${prefix}`,
     expires: 6 * 3600,
-    fsizeLimit: SIZE,
-    fileType: 1
+    fsizeLimit: SIZE
+    // fileType: 1
   });
   return putPolicy.uploadToken(mac);
 }
@@ -36,6 +36,35 @@ export function removeFile(key) {
   return new Promise((resolve, reject) => {
     manager.delete(bucket, key, err => {
       err ? reject(err) : resolve();
+    });
+  });
+}
+
+// combine all files
+export function combineFiles(link, files) {
+  const conf = new qiniu.conf.Config();
+  const bucManager = new qiniu.rs.BucketManager(mac, conf);
+  // validity 1 hour
+  const deadline = parseInt(Date.now() / 1000) + 3600;
+  const operManager = new qiniu.fop.OperationManager(mac, config);
+
+  let key = null;
+  const fops = ['mkzip/4'];
+  files.forEach(v => {
+    const url = bucManager.privateDownloadUrl(domain, v.key, deadline);
+    fops.push(`/encoding/${qiniu.util.urlsafeBase64Encode(url)}`);
+    if (!key) {
+      key = v.key;
+    }
+  });
+  const options = {
+    // 'notifyURL': 'https://bugu.link/combine/callback',
+    'force': false
+  };
+
+  return new Promise((resolve, reject) => {
+    operManager.pfop(bucket, key, fops, null, options, (err, res) => {
+      err ? reject(err) : resolve(res.persistentId);
     });
   });
 }
