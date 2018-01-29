@@ -52,7 +52,8 @@ export default {
     key: 'sid',
     maxAge
   },
-  fileTTL: 7 * 24 * 60 * 60,
+  linkTTL: 7 * 24 * 60 * 60,
+  fileTTL: 14 * 24 * 60 * 60,
   viewPath: join(__dirname, '../views'),
   database: {
     pool,

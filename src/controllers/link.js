@@ -26,7 +26,7 @@ export async function add(ctx) {
     const link = await Link.create({
       id: genToken(),
       code: genCode(),
-      ttl: config.fileTTL,
+      ttl: config.linkTTL,
       creator: user.id,
       receiver: mailto,
       message: message
