@@ -1,5 +1,5 @@
 import config from '../config';
-import { makeRequest, encode64 } from '../utils';
+import { makeRequest, encode64, remain } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function list(ctx) {
@@ -16,8 +16,7 @@ export async function list(ctx) {
     order: [['id', 'DESC']]
   });
   data.rows.forEach(file => {
-    const exp = file.createdAt.getTime() + file.ttl * 1000;
-    file.remain = Math.floor((exp - Date.now()) / 1000);
+    file.remain = remain(file.createdAt, file.ttl);
     if (file.remain > 0) {
       file.url = cdn.downUrl(file.key);
     }

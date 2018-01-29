@@ -1,5 +1,5 @@
 import config from '../config';
-import { genToken, genCode, humanSize, remain } from '../utils';
+import { genToken, genCode, humanSize, remain, formatTTL } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function add(ctx) {
@@ -101,16 +101,20 @@ export async function detail(ctx) {
   const { user } = ctx.session;
   const link = await Link.findById(id);
 
-  ctx.assert(link && link.creator === user.id, 400, 'Cannot find this link');
-  const sql = 'select f.name, f.key, f.ttl from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
-  const files = await query(sql, [link.id]);
+  ctx.assert(link, 400, 'Link not found');
+  ctx.assert(link.creator === user.id, 400, 'You have no permission');
 
-  files.forEach(v => {
-    // actived file
-    if (v.status === 1) {
-      v.key = cdn.downUrl(v.key);
-    } else {
-      v.key = null;
+  const sql = `
+    SELECT f.id, f.name, f.key, f.ttl, f.createdAt
+    FROM r_link_file lf
+    INNER JOIN t_file f ON lf.file_id=f.id
+    WHERE lf.link_id=?
+  `;
+  const files = await query(sql, [link.id]);
+  files.forEach(file => {
+    file.remain = remain(file.createdAt, file.ttl);
+    if (file.remain > 0) {
+      file.url = cdn.downUrl(file.key);
     }
   });
 
@@ -123,35 +127,39 @@ export async function download(ctx) {
   const { id } = ctx.params;
   const linkAuth = ctx.session.linkAuth || {};
   const link = await Link.findById(id);
-  const linkttl = Math.floor((link.createdAt.getTime() + link.ttl * 1000 - Date.now()) / 1000);
+  const ttl = remain(link.createdAt, link.ttl);
 
-  ctx.assert(link && link.status === 1 && linkttl >= 0, 404, 'Link is not found');
+  ctx.assert(link && link.status === 1 && ttl >= 0, 404, 'Link is not found');
 
   if (link.code && !linkAuth[link.id]) {
     ctx.state.csrf = ctx.csrf;
     ctx.state.isCode = true;
   } else {
     ctx.state.isCode = false;
-    const sql = 'select f.name, f.key, f.size, f.ttl, f.createdAt from r_link_file lf inner join t_file f on lf.file_id=f.id where lf.link_id=?';
+    const sql = `
+      SELECT f.name, f.key, f.size, f.ttl, f.createdAt
+      FROM r_link_file lf
+      INNER JOIN t_file f ON lf.file_id=f.id
+      WHERE lf.link_id=?
+    `;
     const files = await query(sql, [link.id]);
-
-    files.forEach(v => {
-      const filettl = Math.floor((v.createdAt.getTime() + v.ttl * 1000 - Date.now()) / 1000);
+    files.forEach(file => {
+      const time = remain(file.createdAt, file.ttl);
       // expired file
-      if (filettl < 0) {
-        v.key = null;
+      if (time < 0) {
+        file.key = null;
         link.package = null;
       } else {
-        v.key = cdn.downUrl(v.key);
+        file.key = cdn.downUrl(file.key);
       }
-      v.ttl = remain(filettl);
-      v.size = humanSize(v.size, 1);
+      file.ttl = formatTTL(time);
+      file.size = humanSize(file.size, 1);
     });
     ctx.state.files = files;
     if (link.package) {
       link.package = cdn.downUrl(link.package);
     }
-    link.ttl = remain(linkttl);
+    link.ttl = formatTTL(ttl);
   }
   ctx.state.link = link;
   await ctx.render('download');

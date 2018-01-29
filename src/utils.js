@@ -70,7 +70,12 @@ function pluralize(time, label) {
   return `${time}${label}s`;
 }
 
-export function remain(ttl) {
+export function remain(date, ttl) {
+  const exp = date.getTime() + ttl * 1000;
+  return Math.floor((exp - Date.now()) / 1000);
+}
+
+export function formatTTL(ttl) {
   if (ttl <= 0) {
     return 'Expired';
   }
