@@ -105,7 +105,7 @@ export async function detail(ctx) {
   ctx.assert(link.creator === user.id, 400, 'You have no permission');
 
   const sql = `
-    SELECT f.id, f.name, f.key, f.ttl, f.createdAt
+    SELECT f.id, f.name, f.key, f.ttl, f.size, f.createdAt
     FROM r_link_file lf
     INNER JOIN t_file f ON lf.file_id=f.id
     WHERE lf.link_id=?
@@ -117,7 +117,6 @@ export async function detail(ctx) {
       file.url = cdn.downUrl(file.key);
     }
   });
-
   ctx.body = { link, files };
 }
 
