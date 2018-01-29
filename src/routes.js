@@ -32,6 +32,8 @@ export default function routes(app, config) {
   router.post('/login', user.login);
   router.get('/logout', user.logout);
 
+  router.post('/combine/callback', link.combine);
+
   async function injectParams(ctx, next) {
     ctx.state.env = config.env;
     ctx.state.user = ctx.session.user;

@@ -13,7 +13,7 @@ export async function add(ctx) {
   try {
     const files = await File.findAll({
       transaction,
-      attributes: ['id', 'size', 'key'],
+      attributes: ['id', 'size', 'key', 'name'],
       where: {
         id: { $in: ids },
         creator: user.id
@@ -52,7 +52,8 @@ export async function add(ctx) {
     }
 
     // generate download all link
-    const persistent = await cdn.combineFiles(link, files);
+    const index = await cdn.uploadIndex(files);
+    const persistent = await cdn.combineFiles(link, index.key);
     await RLinkPersistent.create({
       link_id: link.id,
       persistent_id: persistent
@@ -217,5 +218,28 @@ export async function checkCode(ctx) {
     console.warn(e);
     ctx.flash('error', e.message || 'System error');
     ctx.redirect(`/download/${id}`);
+  }
+}
+
+export async function combine(ctx) {
+  const { RLinkPersistent, Link } = ctx.orm();
+  const { body } = ctx.request;
+  const result = body.items[0];
+  if (result.code === 0) {
+    const rlp = await RLinkPersistent.findOne({
+      where: {
+        persistent_id: body.id
+      }
+    });
+    if (rlp) {
+      await Link.update({
+        package: result.key
+      }, {
+        where: {
+          id: rlp.link_id,
+          package: null
+        }
+      });
+    }
   }
 }

@@ -2,9 +2,11 @@
 
 import qiniu from 'qiniu';
 import config from '../config';
+import { encode64 } from '../utils';
 
 const { accessKey, secretKey, domain, bucket } = config.cdn;
 const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+const conf = new qiniu.conf.Config();
 
 // generate upload token
 export function uptoken(prefix = '') {
@@ -22,7 +24,6 @@ export function uptoken(prefix = '') {
 
 // generate download address
 export function downUrl(key) {
-  const conf = new qiniu.conf.Config();
   const manager = new qiniu.rs.BucketManager(mac, conf);
   // validity 6 hour
   const deadline = parseInt(Date.now() / 1000) + 3600 * 6;
@@ -31,7 +32,6 @@ export function downUrl(key) {
 
 // remove cdn file
 export function removeFile(key) {
-  const conf = new qiniu.conf.Config();
   const manager = new qiniu.rs.BucketManager(mac, conf);
   return new Promise((resolve, reject) => {
     manager.delete(bucket, key, err => {
@@ -40,25 +40,37 @@ export function removeFile(key) {
   });
 }
 
-// combine all files
-export function combineFiles(link, files) {
-  const conf = new qiniu.conf.Config();
+export function uploadIndex(files) {
   const bucManager = new qiniu.rs.BucketManager(mac, conf);
   // validity 1 hour
   const deadline = parseInt(Date.now() / 1000) + 3600;
-  const operManager = new qiniu.fop.OperationManager(mac, config);
-
-  let key = null;
-  const fops = ['mkzip/4'];
-  files.forEach(v => {
+  const urls = files.map((v, i) => {
     const url = bucManager.privateDownloadUrl(domain, v.key, deadline);
-    fops.push(`/encoding/${qiniu.util.urlsafeBase64Encode(url)}`);
-    if (!key) {
-      key = v.key;
-    }
+    return `/url/${encode64(url)}/alias/${encode64((i + 1) + '-' + v.name)}`;
   });
   const options = {
-    // 'notifyURL': 'https://bugu.link/combine/callback',
+    scope: bucket
+  };
+  const putPolicy = new qiniu.rs.PutPolicy(options);
+  const uploadToken = putPolicy.uploadToken(mac);
+  const formUploader = new qiniu.form_up.FormUploader(conf);
+  const putExtra = new qiniu.form_up.PutExtra();
+
+  return new Promise((resolve, reject) => {
+    formUploader.put(uploadToken, null, urls.join('\r\n'), putExtra, (err,
+      res) => {
+      err ? reject(err) : resolve(res);
+    });
+  });
+}
+
+// combine all files
+export function combineFiles(link, key) {
+  const operManager = new qiniu.fop.OperationManager(mac, config);
+  const saveas = encode64(`${bucket}:${link.creator}/${parseInt(Date.now() / 1000)}/All.zip`);
+  const fops = [`mkzip/4|saveas/${saveas}`];
+  const options = {
+    'notifyURL': 'https://bugu.link/combine/callback',
     'force': false
   };
 
