@@ -1,3 +1,4 @@
+import CSRF from 'koa-csrf';
 import Router from 'koa-router';
 import * as file from './controllers/file';
 import * as home from './controllers/home';
@@ -45,6 +46,16 @@ export default function routes(app, config) {
     await next();
   }
 
+  async function linkCombine(ctx, next) {
+    if (ctx.path === '/combine/callback') {
+      await link.combine(ctx);
+    } else {
+      await next();
+    }
+  }
+
+  app.use(linkCombine);
+  app.use(new CSRF());
   app.use(injectParams);
   app.use(router.routes());
   app.use(router.allowedMethods());

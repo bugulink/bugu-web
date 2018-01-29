@@ -2,7 +2,6 @@ import Koa from 'koa';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 import session from 'koa-session';
-import CSRF from 'koa-csrf';
 import view from 'koa-view';
 import ORM from 'koa-orm';
 
@@ -20,9 +19,6 @@ app.use(logger());
 /** Sessions **/
 app.keys = config.keys;
 app.use(session(config.session, app));
-
-/** CSRF */
-app.use(new CSRF());
 
 /** View & I18N **/
 app.use(view(config.viewPath, {
