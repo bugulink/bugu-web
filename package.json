@@ -36,6 +36,7 @@
     "koa-csrf": "^3.0.6",
     "koa-logger": "^3.1.0",
     "koa-orm": "^2.3.0",
+    "koa-redis": "^3.1.2",
     "koa-router": "^7.3.0",
     "koa-session": "^5.8.1",
     "koa-view": "^2.1.1",

@@ -1,4 +1,5 @@
 import { join } from 'path';
+import redisStore from 'koa-redis';
 import { version } from '../package.json';
 
 const debug = process.env.NODE_ENV !== 'production';
@@ -49,8 +50,9 @@ export default {
     staticRoot: debug ? 'http://localhost:8000' : process.env.BUGU_STATIC
   },
   session: {
+    maxAge,
     key: 'sid',
-    maxAge
+    store: debug ? null : redisStore()
   },
   linkTTL: 7 * 24 * 60 * 60,
   fileTTL: 14 * 24 * 60 * 60,
