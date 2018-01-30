@@ -222,23 +222,24 @@ export async function checkCode(ctx) {
 
 export async function combine(ctx) {
   const { RLinkPersistent, Link } = ctx.orm();
-  const { body } = ctx.request;
-  const result = body.items[0];
-  if (result.code === 0) {
-    const rlp = await RLinkPersistent.findOne({
-      where: {
-        persistent_id: body.id
-      }
-    });
-    if (rlp) {
-      await Link.update({
-        package: result.key
-      }, {
-        where: {
-          id: rlp.link_id,
-          package: null
-        }
-      });
+  const { id, items } = ctx.request.body;
+  const result = items.length ? items[0] : {};
+
+  ctx.assert(result.code === 0, 400, 'Params is invalid');
+
+  const rlp = await RLinkPersistent.findOne({
+    where: { persistent_id: id }
+  });
+
+  ctx.assert(rlp, 400, 'Persistent not found');
+
+  await Link.update({
+    package: result.key
+  }, {
+    where: {
+      id: rlp.link_id,
+      package: null
     }
-  }
+  });
+  ctx.body = { success: true };
 }

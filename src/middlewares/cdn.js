@@ -67,7 +67,7 @@ export function uploadIndex(files) {
 // combine all files
 export function combineFiles(link, key) {
   const operManager = new qiniu.fop.OperationManager(mac, config);
-  const saveas = encode64(`${bucket}:${link.creator}/${parseInt(Date.now() / 1000)}/All.zip`);
+  const saveas = encode64(`${bucket}:${link.creator}/zip/${Date.now()}/All.zip`);
   const fops = [`mkzip/4|saveas/${saveas}`];
   const options = {
     'notifyURL': 'https://bugu.link/combine/callback',

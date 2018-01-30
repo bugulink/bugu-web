@@ -78,10 +78,10 @@ export default {
     ...mail,
     templates: {
       sendCaptcha: {
-        subject: 'Your captcha for signing in bugu.link',
+        subject: 'Your code for sign in bugu.link',
         html: `
           Dear {{user}}
-          <br><br>Your <a href="https://bugu.link">bugu.link</a> captcha is <span style="font-weight: 500; color: #f4364c;">{{captcha}}</span>. It will be expired in 5 minutes.
+          <br><br>Your <a href="https://bugu.link">bugu.link</a> code is <span style="font-weight: 500; color: #f4364c;">{{code}}</span>. It will be expired in 5 minutes.
           <br><br><br><br>To make sure our emails arrive, please add noreply@bugu.link to your contacts.
         `
       },
