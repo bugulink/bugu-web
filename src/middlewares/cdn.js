@@ -16,8 +16,8 @@ export function uptoken(prefix = '') {
     isPrefixalScope: 1,
     scope: `${bucket}:${prefix}`,
     expires: 6 * 3600,
-    fsizeLimit: SIZE
-    // fileType: 1
+    fsizeLimit: SIZE,
+    fileType: 1
   });
   return putPolicy.uploadToken(mac);
 }
