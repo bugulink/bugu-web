@@ -28,7 +28,7 @@ export async function captcha(ctx) {
 
   await ctx.sendMail(user.email, null, 'sendCaptcha', {
     user: user.email,
-    captcha: genTOTP(user.totp_key)
+    code: genTOTP(user.totp_key)
   });
 
   ctx.body = { message: 'Success' };
