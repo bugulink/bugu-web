@@ -1,6 +1,7 @@
 'use strict';
 
 import qiniu from 'qiniu';
+import { encodePath } from 'uri-utils';
 import config from '../config';
 import { encode64 } from '../utils';
 
@@ -27,7 +28,7 @@ export function downUrl(key) {
   const manager = new qiniu.rs.BucketManager(mac, conf);
   // validity 6 hour
   const deadline = parseInt(Date.now() / 1000) + 3600 * 6;
-  return manager.privateDownloadUrl(domain, key, deadline);
+  return manager.privateDownloadUrl(domain, encodePath(key), deadline);
 }
 
 // remove cdn file
@@ -45,7 +46,7 @@ export function uploadIndex(files) {
   // validity 1 hour
   const deadline = parseInt(Date.now() / 1000) + 3600;
   const urls = files.map((v, i) => {
-    const url = bucManager.privateDownloadUrl(domain, v.key, deadline);
+    const url = bucManager.privateDownloadUrl(domain, encodePath(v.key), deadline);
     return `/url/${encode64(url)}/alias/${encode64((i + 1) + '-' + v.name)}`;
   });
   const options = {
