@@ -52,12 +52,14 @@ export async function add(ctx) {
     }
 
     // generate download all link
-    const index = await cdn.uploadIndex(files);
-    const persistent = await cdn.combineFiles(link, index.key);
-    await RLinkPersistent.create({
-      link_id: link.id,
-      persistent_id: persistent
-    }, { transaction });
+    if (files.length > 1) {
+      const index = await cdn.uploadIndex(files);
+      const persistent = await cdn.combineFiles(link, index.key);
+      await RLinkPersistent.create({
+        link_id: link.id,
+        persistent_id: persistent
+      }, { transaction });
+    }
 
     await transaction.commit();
     ctx.body = link;
