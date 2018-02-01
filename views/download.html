@@ -45,7 +45,12 @@
       {% else %}
       <div class="download-section">
         <div class="download-container">
-          <div class="download-title">Link will expire in {{link.ttl}}</div>
+          <div class="download-title">
+            <span>Link will expire in {{link.ttl}}</span>
+            {% if link.package %}
+            <a href="{{link.package}}" class="btn btn-primary" style="float: left;">Download All</a>
+            {% endif %}
+          </div>
           <table class="table table-hover">
             <colgroup>
               <col width="69%">
@@ -82,11 +87,6 @@
               {% endfor %}
             </tbody>
           </table>
-          {% if link.package %}
-          <div class="download-btns">
-            <a href="{{link.package}}" class="btn btn-primary">Download All</a>
-          </div>
-          {% endif %}
         </div>
       </div>
       {% endif %}
