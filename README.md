@@ -1,5 +1,5 @@
-BuguLink
-========
+[BuguLink](https://bugu.link)
+=============================
 
 [BuguLink](https://bugu.link) is a secure file-sharing website. It is an MIT-licensed open source project. The project contains two parts: [backend](https://github.com/bugulink/bugu-web) (Node.js + Koa2 + MySQL + Redis) and [frontend](https://github.com/bugulink/bugu-static) (React + [Yax](https://github.com/d-band/yax) + ReactRouter). It use [Qiniu](https://www.qiniu.com) CDN to storage files.
 
