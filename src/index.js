@@ -29,11 +29,12 @@ app.use(view(config.viewPath, {
 app.orm = ORM(config.database);
 app.use(app.orm.middleware);
 
-// app.orm.database().sync({
-//   force: false
-// }).then(() => {
-//   console.log('Sync done.');
-// });
+/* Sync database */
+app.orm.database().sync({
+  force: false
+}).then(() => {
+  console.log('Sync done.');
+});
 
 /** Middlewares **/
 error(app);
