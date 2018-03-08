@@ -1,5 +1,3 @@
-'use strict';
-
 import crypto from 'crypto';
 import { totp } from 'notp';
 import axios from 'axios';

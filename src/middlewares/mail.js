@@ -1,5 +1,3 @@
-'use strict';
-
 import nm from 'nodemailer';
 import template from 'lodash.template';
 import { downUrl } from './cdn';

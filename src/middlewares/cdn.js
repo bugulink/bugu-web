@@ -1,5 +1,3 @@
-'use strict';
-
 import qiniu from 'qiniu';
 import { encodePath } from 'uri-utils';
 import config from '../config';

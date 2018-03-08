@@ -1,5 +1,3 @@
-'use strict';
-
 import { genToken, verifyTOTP } from '../utils';
 
 module.exports = function(sequelize, DataTypes) {
