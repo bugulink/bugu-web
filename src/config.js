@@ -56,6 +56,7 @@ export default {
   },
   linkTTL: 7 * 24 * 60 * 60,
   fileTTL: 14 * 24 * 60 * 60,
+  capacity: 5 * 1024 * 1024 * 1024,
   viewPath: join(__dirname, '../views'),
   database: {
     pool,
