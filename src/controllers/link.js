@@ -52,7 +52,7 @@ export async function add(ctx) {
     }
 
     // generate download all link
-    if (files.length > 1) {
+    if (files.length > 5) {
       const index = await cdn.uploadIndex(files);
       const persistent = await cdn.combineFiles(link, index.key);
       await RLinkPersistent.create({
