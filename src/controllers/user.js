@@ -1,3 +1,4 @@
+import config from '../config';
 export async function login(ctx) {
   const { User } = ctx.orm();
   const { email, code } = ctx.request.body;
@@ -30,4 +31,19 @@ export async function logout(ctx) {
     delete ctx.session.user;
   }
   ctx.redirect('/');
+}
+
+export async function capacity(ctx) {
+  const { File } = ctx.orm();
+  const { user } = ctx.session;
+  // use the config fileTTL
+  const files = await File.findAll({
+    where: {
+      creator: user.id,
+      createdAt: {
+        $gt: new Date(Date.now() - config.fileTTL * 1000)
+      }
+    }
+  });
+  ctx.body = files.reduce((p, c) => (p += c.size), 0);
 }
