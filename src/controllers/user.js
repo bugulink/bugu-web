@@ -38,7 +38,7 @@ export async function capacity(ctx) {
   const { File } = ctx.orm();
   const { user } = ctx.session;
   // use the config fileTTL
-  const files = await File.findAll({
+  const used = await File.sum('size', {
     where: {
       creator: user.id,
       createdAt: {
@@ -47,7 +47,7 @@ export async function capacity(ctx) {
     }
   });
   ctx.body = {
-    total: config.capacity,
-    used: files.reduce((p, c) => (p += c.size), 0)
+    used,
+    total: config.capacity
   };
 }
