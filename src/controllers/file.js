@@ -44,6 +44,16 @@ export async function upload(ctx) {
   ctx.assert(data, 400, 'Data is required');
   ctx.assert(token, 400, 'Token is required');
 
+  const used = await File.sum('size', {
+    where: {
+      creator: user.id,
+      createdAt: {
+        $gt: new Date(Date.now() - config.fileTTL * 1000)
+      }
+    }
+  });
+  ctx.assert(used + size < config.capacity, 'No enough capacity');
+
   const host = config.cdn.uphost;
   const url = `${host}/mkfile/${size}/key/${encode64(key)}`;
   const request = makeRequest(3);

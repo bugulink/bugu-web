@@ -1,4 +1,5 @@
 import config from '../config';
+
 export async function login(ctx) {
   const { User } = ctx.orm();
   const { email, code } = ctx.request.body;
@@ -37,7 +38,7 @@ export async function capacity(ctx) {
   const { File } = ctx.orm();
   const { user } = ctx.session;
   // use the config fileTTL
-  const files = await File.findAll({
+  const used = await File.sum('size', {
     where: {
       creator: user.id,
       createdAt: {
@@ -45,5 +46,8 @@ export async function capacity(ctx) {
       }
     }
   });
-  ctx.body = files.reduce((p, c) => (p += c.size), 0);
+  ctx.body = {
+    used,
+    total: config.capacity
+  };
 }
