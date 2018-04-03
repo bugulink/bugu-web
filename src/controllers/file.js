@@ -52,7 +52,7 @@ export async function upload(ctx) {
       }
     }
   });
-  ctx.assert(used + size < config.capacity, 'No enough capacity');
+  ctx.assert((used || 0) + size < config.capacity, 'No enough capacity');
 
   const host = config.cdn.uphost;
   const url = `${host}/mkfile/${size}/key/${encode64(key)}`;

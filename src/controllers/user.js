@@ -47,7 +47,7 @@ export async function capacity(ctx) {
     }
   });
   ctx.body = {
-    used,
+    used: used || 0,
     total: config.capacity
   };
 }
