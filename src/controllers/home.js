@@ -4,6 +4,10 @@ export async function main(ctx) {
   await ctx.render('index');
 }
 
+export async function terms(ctx) {
+  await ctx.render('terms');
+}
+
 export async function captcha(ctx) {
   const { User } = ctx.orm();
   const { email } = ctx.request.body;

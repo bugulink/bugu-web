@@ -9,6 +9,7 @@ export default function routes(app, config) {
   const router = new Router();
 
   router.get('/', home.main);
+  router.get('/terms', home.terms);
   router.get('/login', home.main);
   router.get('/links', user.isLogin, home.main);
   router.get('/link/:id', user.isLogin, home.main);
