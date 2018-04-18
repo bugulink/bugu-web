@@ -40,7 +40,7 @@ export async function add(ctx) {
 
     if (mailto) {
       const size = files.reduce((p, c) => (p + c.size), 0);
-      await ctx.sendMail(mailto, null, 'sendLink', {
+      await ctx.sendMail(mailto, user.email, 'sendLink', {
         sender: user.email,
         link: `https://bugu.link/download/${link.id}`,
         code: link.code,
