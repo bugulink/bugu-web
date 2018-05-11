@@ -64,3 +64,7 @@
 ## License
 
 BuguLink is available under the terms of the MIT License.
+
+## Buy Me A Coffee
+
+<img src="https://g-cdn.cnood.com/donate.png" height="180">
