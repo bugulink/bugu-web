@@ -85,7 +85,7 @@ export default {
     ...mail,
     templates: {
       sendCaptcha: {
-        subject: 'Your code for sign in bugu.link',
+        subject: '{{code}} is your code for sign in bugu.link',
         html: `
           Dear {{user}}
           <br><br>Your <a href="https://bugu.link">bugu.link</a> code is <span style="font-weight: 500; color: #f4364c;">{{code}}</span>. It will be expired in 5 minutes.

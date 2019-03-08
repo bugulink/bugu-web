@@ -8,7 +8,10 @@ export default function(app, options = {}) {
   // 添加 Render 函数
   Object.keys(templates).forEach(k => {
     const html = `<p style="width:640px;margin:0 auto;padding:15px;color:#666;-webkit-font-smoothing:antialiased;font-family:'Helvetica Neue',Helvetica,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',微软雅黑,SimSun,sans-serif;">${templates[k].html}</p>`;
-    templates[k].render = template(html, {
+    templates[k].subject = template(templates[k].subject, {
+      interpolate: /{{([\s\S]+?)}}/g
+    });
+    templates[k].html = template(html, {
       interpolate: /{{([\s\S]+?)}}/g
     });
   });
@@ -29,8 +32,8 @@ export default function(app, options = {}) {
         to: to,
         cc: cc,
         attachments: attachments,
-        subject: tpl.subject,
-        html: tpl.render(context)
+        subject: tpl.subject(context),
+        html: tpl.html(context)
       });
     };
 
