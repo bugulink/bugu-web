@@ -34,6 +34,8 @@ app.orm.database().sync({
   force: false
 }).then(() => {
   console.log('Sync done.');
+}).catch(e => {
+  console.warn(e.message);
 });
 
 /** Middlewares **/
