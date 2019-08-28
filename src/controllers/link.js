@@ -102,7 +102,7 @@ export async function detail(ctx) {
   const { Link, query } = ctx.orm();
   const { id } = ctx.request.body;
   const { user } = ctx.session;
-  const link = await Link.findById(id);
+  const link = await Link.findByPk(id);
 
   ctx.assert(link, 400, 'Link not found');
   ctx.assert(link.creator === user.id, 400, 'You have no permission');
@@ -128,7 +128,7 @@ export async function download(ctx) {
   const { Link, query } = ctx.orm();
   const { id } = ctx.params;
   const linkAuth = ctx.session.linkAuth || {};
-  const link = await Link.findById(id);
+  const link = await Link.findByPk(id);
   const ttl = remain(link.createdAt, link.ttl);
 
   ctx.assert(link && link.status === 1 && ttl >= 0, 404, 'Link is not found');
@@ -173,7 +173,7 @@ export async function changeCode(ctx) {
   const { id } = ctx.request.body;
   const { user } = ctx.session;
 
-  const link = await Link.findById(id);
+  const link = await Link.findByPk(id);
   ctx.assert(link && link.creator === user.id && link.status === 1, 400, 'You have no permission');
 
   const code = link.code ? null : genCode();
@@ -188,7 +188,7 @@ export async function remove(ctx) {
   const { id } = ctx.request.body;
   const { user } = ctx.session;
 
-  const link = await Link.findById(id);
+  const link = await Link.findByPk(id);
   ctx.assert(link && link.creator === user.id && link.status === 1, 400, 'You have no permission');
 
   await link.update({ status: 0 });
@@ -209,7 +209,7 @@ export async function checkCode(ctx) {
       ctx.session.linkAuth = {};
     }
 
-    const link = await Link.findById(id);
+    const link = await Link.findByPk(id);
     ctx.assert(link && link.status === 1, 404, 'Link is not found');
     ctx.assert(link.code === code, 400, 'Code is invalid');
     ctx.session.linkAuth[link.id] = true;

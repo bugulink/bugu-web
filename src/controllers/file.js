@@ -76,7 +76,7 @@ export async function remove(ctx) {
   const { File, RLinkFile } = ctx.orm();
   const { id } = ctx.request.body;
   const { user } = ctx.session;
-  const file = await File.findById(id);
+  const file = await File.findByPk(id);
 
   ctx.assert(file && file.creator === user.id, 400, 'File is not existed');
   const count = await RLinkFile.count({
