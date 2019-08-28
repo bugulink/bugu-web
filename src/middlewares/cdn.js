@@ -69,8 +69,8 @@ export function combineFiles(link, key) {
   const saveas = encode64(`${bucket}:${link.creator}/zip/${Date.now()}/All.zip`);
   const fops = [`mkzip/4|saveas/${saveas}`];
   const options = {
-    'notifyURL': 'https://bugu.link/combine/callback',
-    'force': false
+    notifyURL: 'https://bugu.link/combine/callback',
+    force: false
   };
 
   return new Promise((resolve, reject) => {

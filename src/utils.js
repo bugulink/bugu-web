@@ -7,7 +7,7 @@ import generate from 'nanoid/generate';
 const TOTP_TIME = 300;
 
 export function genToken() {
-  let buffer = crypto.randomBytes(256);
+  const buffer = crypto.randomBytes(256);
   return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
