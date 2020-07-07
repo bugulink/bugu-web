@@ -1,14 +1,12 @@
-import crypto from 'crypto';
 import { totp } from 'notp';
 import axios from 'axios';
-import generate from 'nanoid/generate';
+import { customAlphabet, nanoid } from 'nanoid';
 
 // TOTP time 5 minutes
 const TOTP_TIME = 300;
 
 export function genToken() {
-  const buffer = crypto.randomBytes(256);
-  return crypto.createHash('sha256').update(buffer).digest('hex');
+  return nanoid();
 }
 
 export function genTOTP(key) {
@@ -50,7 +48,7 @@ export function encode64(str) {
 }
 
 export function genCode(len = 4) {
-  return generate('1234567890', len);
+  return customAlphabet('1234567890', len)();
 }
 
 const mags = ' KMGTPEZY';
