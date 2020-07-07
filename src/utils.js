@@ -5,8 +5,8 @@ import { customAlphabet, nanoid } from 'nanoid';
 // TOTP time 5 minutes
 const TOTP_TIME = 300;
 
-export function genToken() {
-  return nanoid();
+export function genToken(len = 21) {
+  return nanoid(len);
 }
 
 export function genTOTP(key) {

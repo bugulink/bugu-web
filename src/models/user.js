@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
   User.add = async function(email) {
     const result = await this.create({
       email,
-      totp_key: genToken()
+      totp_key: genToken(64)
     });
     return result;
   };
