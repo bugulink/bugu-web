@@ -34,7 +34,7 @@ export async function uptoken(ctx) {
 }
 
 export async function upload(ctx) {
-  const { File } = ctx.orm();
+  const { File, Op } = ctx.orm();
   const { user } = ctx.session;
   const { key, size, name, data, token } = ctx.request.body;
 
@@ -48,7 +48,7 @@ export async function upload(ctx) {
     where: {
       creator: user.id,
       createdAt: {
-        $gt: new Date(Date.now() - config.fileTTL * 1000)
+        [Op.gt]: new Date(Date.now() - config.fileTTL * 1000)
       }
     }
   });

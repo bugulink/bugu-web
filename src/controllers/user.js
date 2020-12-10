@@ -35,14 +35,14 @@ export async function logout(ctx) {
 }
 
 export async function capacity(ctx) {
-  const { File } = ctx.orm();
+  const { File, Op } = ctx.orm();
   const { user } = ctx.session;
   // use the config fileTTL
   const used = await File.sum('size', {
     where: {
       creator: user.id,
       createdAt: {
-        $gt: new Date(Date.now() - config.fileTTL * 1000)
+        [Op.gt]: new Date(Date.now() - config.fileTTL * 1000)
       }
     }
   });

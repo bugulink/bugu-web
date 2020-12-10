@@ -3,7 +3,7 @@ import { genToken, genCode, humanSize, remain, formatTTL } from '../utils';
 import * as cdn from '../middlewares/cdn';
 
 export async function add(ctx) {
-  const { Link, RLinkFile, File, RLinkPersistent, sequelize } = ctx.orm();
+  const { Link, RLinkFile, File, RLinkPersistent, sequelize, Op } = ctx.orm();
   const { ids, receiver, message } = ctx.request.body;
   const { user } = ctx.session;
 
@@ -15,7 +15,7 @@ export async function add(ctx) {
       transaction,
       attributes: ['id', 'size', 'key', 'name'],
       where: {
-        id: { $in: ids },
+        id: { [Op.in]: ids },
         creator: user.id
       }
     });
