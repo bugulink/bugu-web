@@ -17,6 +17,12 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(64),
       allowNull: false,
       comment: 'totp key'
+    },
+    capacity: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 10 * 1024 * 1024,
+      comment: 'user capacity'
     }
   }, {
     tableName: 't_user',

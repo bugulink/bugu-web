@@ -15,7 +15,6 @@ const pool = {
 };
 const linkTTL = parseInt(env.BUGU_LINK_TTL) || 7 * 24 * 3600;
 const fileTTL = parseInt(env.BUGU_FILE_TTL) || 14 * 24 * 3600;
-const capacity = parseInt(env.BUGU_CAPACITY) || 5 * 1024 * 1024 * 1024;
 
 const mail = debug ? {
   from: 'admin@example.com',
@@ -60,7 +59,6 @@ export default {
   },
   linkTTL,
   fileTTL,
-  capacity,
   viewPath: join(__dirname, '../views'),
   database: {
     pool,

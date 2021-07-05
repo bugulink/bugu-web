@@ -48,6 +48,6 @@ export async function capacity(ctx) {
   });
   ctx.body = {
     used: used || 0,
-    total: config.capacity
+    total: user.capacity
   };
 }
