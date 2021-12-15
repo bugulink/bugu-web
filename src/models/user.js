@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
     capacity: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      defaultValue: 10 * 1024 * 1024,
+      defaultValue: 2 * 1024 * 1024,
       comment: 'user capacity'
     }
   }, {
